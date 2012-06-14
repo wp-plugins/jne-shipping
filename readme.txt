@@ -13,7 +13,7 @@ Dengan menggunakan **JNE Shipping**, maka anda dapat menampilkan daftar ongkos k
 
 Cocok digunakan untuk menampilkan daftar ongkos kirim dari JNE dan secara langsung akan berpengaruh pada nilai order anda.
 
-Untuk informasi lebih lanjut mengenai plugin ini, silakan langsung saja [kemari](http://chung.web.id).
+Untuk informasi lebih lanjut mengenai plugin ini, silakan langsung saja [kemari](http://chung.web.id). 
 
 **[Laporkan Bug dan support](http://blog.chung.web.id/tag/jne-indo-shipping/)**
 
