@@ -4,6 +4,11 @@
    <!--a class="add-new-h2" href="admin.php?page=jne-tarif&act=import">Import Tarif</a-->
    <a class="add-new-h2" href="options-general.php?page=jne-shipping&act=import">Import Tarif</a>
 </h2>
+
+<?php if ($__message): ?>
+<div class="updated fade below-h2" id="message" style="background-color: rgb(255, 251, 204);"><p><?php echo $__message; ?></p></div><br />
+<?php endif; ?>
+
 <br class="clear" />
 
 <?php include_once('donation.view.php'); ?>
@@ -58,7 +63,7 @@
    <tr class="<?php echo $class;?>">
       <th class="check-column" scope="row"><input type="checkbox" value="<?php echo $result->id;?>" name="post[]"></th>
       <td><strong><?php echo $result->kota;?></strong>
-         <div class="row-actions"><span class="edit"><a title="Edit this item" href="">Edit</a> | </span><span class="inline hide-if-no-js"><a title="Edit this item inline" class="editinline" href="#">Quick&nbsp;Edit</a> | </span><span class="trash"><a href="" title="Move this item to the Trash" class="submitdelete">Delete</a></span></div>
+         <div class="row-actions"><span class="edit"><a title="Edit this item" href="options-general.php?page=jne-shipping&act=edit&id=<?php echo $result->id;?>">Edit</a> | </span><!-- span class="inline hide-if-no-js"><a title="Edit this item inline" class="editinline" href="#">Quick&nbsp;Edit</a> | </span--><span class="trash"><a href="options-general.php?page=jne-shipping&act=delete&id=<?php echo $result->id;?>" title="Move this item to the Trash" class="submitdelete delete-tag" onclick="return confirm('Anda yakin akan menghapus data?');">Delete</a></span></div>
       </td>
       <td><?php if (!empty($result->oke)) echo number_format($result->oke, 0, ',', '.');?></td>
       <td><?php if (!empty($result->reg))echo number_format($result->reg, 0, ',', '.');?></td>
