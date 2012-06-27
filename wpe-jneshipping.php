@@ -161,9 +161,20 @@ http://chung.web.id";
          
          include_once('display_tarif_import.view.php');
          return;
+      } else if (isset($_GET['act']) && $_GET['act'] == 'edit') {
+         $id = $_GET['id'];
+         $query = "SELECT * FROM {$table_name} WHERE id='{$id}'";
+         $data = $wpdb->get_row($query, ARRAY_A);
+         include_once('display_edit_tarif.view.php');
+         return;
+      } else if (isset($_GET['act']) && $_GET['act'] == 'delete') {
+         $id = $_GET['id'];
+         $wpdb->query("DELETE FROM {$table_name} WHERE id={$id}");
+         $__message = "Data telah dihapus.";
       }
       
-      if (isset($_POST['action']) && $_POST['action'] == 'save') {
+      if (isset($_POST['action']) && $_POST['action'] == 'update') {
+         $id = $_POST['id'];
          $data['kota'] = $_POST['kota'];
          $data['oke'] = $_POST['oke'];
          $data['reg'] = $_POST['reg'];
@@ -176,8 +187,27 @@ http://chung.web.id";
             }
          }
          
-         $wpdb->insert($table_name, $fields);
-        
+         $wpdb->update($table_name, $fields, array('id' => $id));
+         
+         $__message = "Data telah diubah.";
+      
+      } else if (isset($_POST['action']) && $_POST['action'] == 'save') {
+         $data['kota'] = $_POST['kota'];
+         $data['oke'] = $_POST['oke'];
+         $data['reg'] = $_POST['reg'];
+         $data['yes'] = $_POST['yes'];
+         $data['ss'] = $_POST['ss'];
+         
+         foreach ($data as $key => $val) {
+            if (!empty($val)) { 
+               $fields[$key] = $val;
+            }
+         }
+         
+         if (!empty($data['kota'])) {           
+            $wpdb->insert($table_name, $fields);
+         }
+             
       }
       
       $sql = "SELECT * FROM {$table_name} ";
