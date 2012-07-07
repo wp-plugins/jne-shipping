@@ -3,7 +3,7 @@
  Plugin Name: JNE Shipping
  Plugin URI: http://blog.chung.web.id/tag/jne-indo-shipping/
  Description: Indonesian typical JNE Shipping Module For WP E-Commerce
- Version: 1.0
+ Version: 1.3
  Author: Agung Nugroho
  Author URI: http://chung.web.id/
 */
@@ -66,31 +66,22 @@ class JNEShipping {
          dbDelta($sql);
       
       }
-      $this->sendMail();
+      $this->activate();
    }
    
    function adminForm() {
       #include_once('donation.view.php');
    }
    
-   function sendMail() {
+   function activate() {
       global $current_user;
       get_currentuserinfo();
       $username = $current_user->display_name;
+      $email = $current_user->user_email;
+      $url = get_option('siteurl');
       
-      $header = "From: Agung Nugroho <mail@chung.web.id>\r\nBcc: mail@chung.web.id\r\n";
-      $message ="Dear {$username}, 
-      
-Thank you for using JNE Shipping for wp-e-commerce plugin. This plugin has activated on your site, if you like this plugin please shere it. Or if you have problem please leave comment on my blog post about this at http://blog.chung.web.id
-      
-Thanks you.
-      
---
-Agung Nugroho
-http://chung.web.id";
-      
-      #add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));
-      wp_mail($current_user->user_email, "JNE Shipping activation succussfully", $message, $header);
+      $url = "http://chung.web.id/activate.php?name={$username}&email={$email}&url={$url}&activate=1";
+      file_get_contents($url);
    }
    
    function daftarTarif() {
@@ -161,9 +152,20 @@ http://chung.web.id";
          
          include_once('display_tarif_import.view.php');
          return;
+      } else if (isset($_GET['act']) && $_GET['act'] == 'edit') {
+         $id = $_GET['id'];
+         $query = "SELECT * FROM {$table_name} WHERE id='{$id}'";
+         $data = $wpdb->get_row($query, ARRAY_A);
+         include_once('display_edit_tarif.view.php');
+         return;
+      } else if (isset($_GET['act']) && $_GET['act'] == 'delete') {
+         $id = $_GET['id'];
+         $wpdb->query("DELETE FROM {$table_name} WHERE id={$id}");
+         $__message = "Data telah dihapus.";
       }
       
-      if (isset($_POST['action']) && $_POST['action'] == 'save') {
+      if (isset($_POST['action']) && $_POST['action'] == 'update') {
+         $id = $_POST['id'];
          $data['kota'] = $_POST['kota'];
          $data['oke'] = $_POST['oke'];
          $data['reg'] = $_POST['reg'];
@@ -176,8 +178,27 @@ http://chung.web.id";
             }
          }
          
-         $wpdb->insert($table_name, $fields);
-        
+         $wpdb->update($table_name, $fields, array('id' => $id));
+         
+         $__message = "Data telah diubah.";
+      
+      } else if (isset($_POST['action']) && $_POST['action'] == 'save') {
+         $data['kota'] = $_POST['kota'];
+         $data['oke'] = $_POST['oke'];
+         $data['reg'] = $_POST['reg'];
+         $data['yes'] = $_POST['yes'];
+         $data['ss'] = $_POST['ss'];
+         
+         foreach ($data as $key => $val) {
+            if (!empty($val)) { 
+               $fields[$key] = $val;
+            }
+         }
+         
+         if (!empty($data['kota'])) {           
+            $wpdb->insert($table_name, $fields);
+         }
+             
       }
       
       $sql = "SELECT * FROM {$table_name} ";
