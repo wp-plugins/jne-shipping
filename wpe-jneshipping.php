@@ -3,7 +3,7 @@
  Plugin Name: JNE Shipping
  Plugin URI: http://blog.chung.web.id/tag/jne-indo-shipping/
  Description: Indonesian typical JNE Shipping Module For WP E-Commerce
- Version: 1.3
+ Version: 1.4
  Author: Agung Nugroho
  Author URI: http://chung.web.id/
 */
@@ -268,6 +268,8 @@ class JNEShipping {
    
    function getTarif($destination) {
       global $wpdb;
+      
+      if (empty($destination)) return array(0);
       
       $currentDestLocation = $_SESSION['wpe_jneshipp_current_dest_location'];
       $currentWeightInPound = $_SESSION['wpe_jneshipp_current_weight_in_pound'];
