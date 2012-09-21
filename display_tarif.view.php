@@ -17,22 +17,22 @@
 <div id="col-right">
 
 
-
+<form action="" method="post">
 <div class="tablenav top">
 <div class="alignleft">
-   <select name="">
+   <select name="act">
       <option>Bulk Actions</option>
-      <option>Hapus</option>
+      <option value="delete-all">Hapus</option>
    </select>
    <input type="submit" name="submit" class="button" value="Apply" />
 </div>
 
-<!--div class="tablenav-pages one-page"><span class="displaying-num"></span>
-<span class="pagination-links"><a href="http://localhost/wp3/wp-admin/edit.php?post_type=wpsc-product" title="Go to the first page" class="first-page disabled">«</a>
-<a href="http://localhost/wp3/wp-admin/edit.php?post_type=wpsc-product&amp;paged=1" title="Go to the previous page" class="prev-page disabled">‹</a>
-<span class="paging-input"><input type="text" size="1" value="1" name="paged" title="Current page" class="current-page" id="acpro_inp20"> of <span class="total-pages">1</span></span>
-<a href="http://localhost/wp3/wp-admin/edit.php?post_type=wpsc-product&amp;paged=1" title="Go to the next page" class="next-page disabled">›</a>
-<a href="http://localhost/wp3/wp-admin/edit.php?post_type=wpsc-product&amp;paged=1" title="Go to the last page" class="last-page disabled">»</a></span></div-->
+<div class="tablenav-pages <?php echo (($items < 20) ? 'one-page' : '');?>"><span class="displaying-num"><?php echo $items;?> items</span>
+<span class="pagination-links"><a href="<?php echo $this->baseUrl;?>" title="Go to the first page" class="first-page disabled">&laquo;</a>
+<a href="<?php echo $this->baseUrl;?>&amp;pg=<?php echo $prev;?>" title="Go to the previous page" class="prev-page disabled">&lt;</a>
+<span class="paging-input"><input type="text" size="1" value="<?php echo $page;?>" name="paged" title="Current page" class="current-page" id="acpro_inp20"> of <span class="total-pages"><?php echo $pages;?></span></span>
+<a href="<?php echo $this->baseUrl;?>&amp;pg=<?php echo $next;?>" title="Go to the next page" class="next-page disabled">&gt;</a>
+<a href="<?php echo $this->baseUrl;?>&amp;pg=<?php echo $pages;?>" title="Go to the last page" class="last-page disabled">&raquo;</a></span></div>
 		<br class="clear">
 	</div>
 	
@@ -73,7 +73,7 @@
 <?php endforeach; endif; ?>
 </tbody>
 </table>
-
+</form>
 
 </div>
 <div id="col-left">
