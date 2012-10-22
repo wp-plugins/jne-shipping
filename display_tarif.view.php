@@ -23,6 +23,8 @@
    <select name="act">
       <option>Bulk Actions</option>
       <option value="delete-all">Hapus</option>
+      <option value="reset">Kosongkan</option>
+      <!--option value="export">Export Data</option-->
    </select>
    <input type="submit" name="submit" class="button" value="Apply" />
 </div>
@@ -83,3 +85,13 @@
 </div>
 
 </div>
+<script>
+jQuery(document).ready(function($) {
+	$('form').submit(function() {
+		if ($('[name="act"]').val() == 'delete-all')
+			return confirm('Anda yakin ingin menghapus data?');
+		else if ($('[name="act"]').val() == 'reset')
+			return confirm('Anda yakin ingin mengosongkan data?');
+	});
+});
+</script>

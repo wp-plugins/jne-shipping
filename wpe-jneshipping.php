@@ -3,7 +3,7 @@
  Plugin Name: JNE Shipping
  Plugin URI: http://blog.chung.web.id/tag/jne-indo-shipping/
  Description: Indonesian typical JNE Shipping Module For WP E-Commerce
- Version: 1.5
+ Version: 1.6
  Author: Agung Nugroho
  Author URI: http://chung.web.id/
 */
@@ -108,6 +108,8 @@ class JNEShipping {
                }
             }
          } else if (isset($_POST['action']) && $_POST['action'] == 'import') {
+         	set_time_limit(0);
+         	
             $kota = $_POST['kota'];
             $oke = $_POST['oke'];
             $reg = $_POST['reg'];
@@ -115,16 +117,28 @@ class JNEShipping {
             $ss = $_POST['ss'];
             $insert_opt = $_POST['insert_opt'];
             
+            include_once('display_tarif_import.view.php');
+            flush();
+            
             foreach ($kota as $idx => $_kota) {
                if ($insert_opt == 'update') {
-                  $sqlUpdate = $wpdb->prepare("INSERT ON DUPLICATE KEY UPDATE {$this->table_name} SET 
+                  $sqlUpdate = $wpdb->prepare("INSERT INTO {$this->table_name} SET 
                      kota = %s,
+                     oke = %d,
+                     reg = %d,
+                     yes = %d,
+                     ss = %d
+                  ON DUPLICATE KEY UPDATE 
                      oke = %d,
                      reg = %d,
                      yes = %d,
                      ss = %d
                   ",
                   $_kota,
+                  $oke[$idx],
+                  $reg[$idx],
+                  $yes[$idx],
+                  $ss[$idx],
                   $oke[$idx],
                   $reg[$idx],
                   $yes[$idx],
@@ -147,7 +161,10 @@ class JNEShipping {
                   );
                   $wpdb->query($sqlInsert);
                }
+               echo "<p>{$idx} Importing: {$_kota}</p>";
+               flush();
             }
+            return;
          }
          
          include_once('display_tarif_import.view.php');
@@ -172,6 +189,14 @@ class JNEShipping {
 		      }
 		      $__message = "Data telah dihapus.";
          }
+      } else if (isset($_POST['act']) && $_POST['act'] == 'reset') {
+      	$wpdb->query("TRUNCATE TABLE {$table_name}");
+	      $__message = "Data telah dikosongkan.";
+      } else if (isset($_POST['act']) && $_POST['act'] == 'export') {
+      	$rs = $wpdb->get_results("SELECT * FROM {$table_name}");
+	      #$__message = "Data telah dikosongkan.";
+	      #foreach($rs as $row) {
+	      #}
       }
       
       if (isset($_POST['action']) && $_POST['action'] == 'update') {

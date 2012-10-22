@@ -36,7 +36,6 @@ function findValueDestination(event,data) {
       jQuery('.wpsc_shipping_header').after(data);
 	});
 	
-	//alert('tes');
    jQuery('input[title="billingcity"], input[title="shippingcity"]').val(jQuery('#dest_location').val()).attr('readonly', 'true');
       
 };
@@ -49,12 +48,7 @@ function destLocationForm() {
       //destination
       jQuery("#dest_location").autocomplete(jneshipp.ajaxurl + "?action=GETCITY",{width:250,minChars:3, matchSubset:1, matchContains:1, max:10, cacheLength:20, formatItem:formatItem, selectOnly:1, autoFill:false, cleanUrl:false, multiple:true, multipleSeparator:'|', scroll:false});	
       jQuery("#dest_location").result(findValueDestination).next().click(function(){ });
-   }); //alert(cnt.responseText);
-   //jQuery('.wpsc_change_country').after(cnt.responseText);
- /*  jQuery('.wpsc_change_country').after('<tr class="change_dest_location"><td colspan="5">'
-      + 'City: <input type="text" name="dest_location" id="dest_location" value="" />'
-      + '<input type="hidden" id="dest_location_code" name="dest_location_code" value="" /></td></tr>');
-*/
+   }); 
 }
 
 function baseLocationForm() {
@@ -73,20 +67,7 @@ jQuery(document).ready(function(){
 	//destination
    destLocationForm();
    
-/*	jQuery("#dest_location").autocomplete(jneshipp.ajaxurl + "?action=GETCITY",{width:200,minChars:3, matchSubset:1, matchContains:1, max:10, cacheLength:20, formatItem:formatItem, selectOnly:1, autoFill:false, cleanUrl:false, multiple:true, multipleSeparator:'|', scroll:false});	
-	jQuery("#dest_location").result(findValueDestination).next().click(function(){	});
-
-	jQuery("#clearForm").click(function(){ clearData();});
-	
-	//allowed character
-	jQuery("#base_location").alpha({allow:", "});
-	jQuery("#destination").alpha({allow:", "});
-	jQuery("#weight").numeric({allow:".,"});
-
-	
-	jQuery("#checktariff").click(function(){
-		if(jQuery("#weight").val()=='')jQuery("#weight").val(1);
-		return tariffValidate();			
-	});
-			*/
+   if (jQuery('#dest_location').val() != '' && jQuery('#dest_location').length > 0) {
+   	jQuery('input[title="billingcity"], input[title="shippingcity"]').val(jQuery('#dest_location').val()).attr('readonly', 'true');
+   }
 });
