@@ -67,4 +67,6 @@
 
 <?php endif; ?>
 
+<?php if (isset($log)) echo '<p>'.$log.'</p>'; ?>
+
 </div>

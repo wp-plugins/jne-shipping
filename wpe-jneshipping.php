@@ -3,7 +3,7 @@
  Plugin Name: JNE Shipping
  Plugin URI: http://blog.chung.web.id/tag/jne-indo-shipping/
  Description: Indonesian typical JNE Shipping Module For WP E-Commerce
- Version: 1.3
+ Version: 1.6
  Author: Agung Nugroho
  Author URI: http://chung.web.id/
 */
@@ -32,7 +32,7 @@ class JNEShipping {
       $this->name = "JNE Shipping";
       $this->is_external = true;
       $this->pluginUrl = get_option('siteurl') . '/wp-content/plugins/' . dirname(plugin_basename(__FILE__));
-		$this->baseUrl = get_option('siteurl') . '/wp-admin/admin.php?page=jne-shipping';
+		$this->baseUrl = get_option('siteurl') . '/wp-admin/options-general.php?page=jne-shipping';
 		
 		$this->table_name = $wpdb->prefix . 'jne_shipping';
       
@@ -108,6 +108,8 @@ class JNEShipping {
                }
             }
          } else if (isset($_POST['action']) && $_POST['action'] == 'import') {
+         	set_time_limit(0);
+         	
             $kota = $_POST['kota'];
             $oke = $_POST['oke'];
             $reg = $_POST['reg'];
@@ -115,16 +117,28 @@ class JNEShipping {
             $ss = $_POST['ss'];
             $insert_opt = $_POST['insert_opt'];
             
+            include_once('display_tarif_import.view.php');
+            flush();
+            
             foreach ($kota as $idx => $_kota) {
                if ($insert_opt == 'update') {
-                  $sqlUpdate = $wpdb->prepare("INSERT ON DUPLICATE KEY UPDATE {$this->table_name} SET 
+                  $sqlUpdate = $wpdb->prepare("INSERT INTO {$this->table_name} SET 
                      kota = %s,
+                     oke = %d,
+                     reg = %d,
+                     yes = %d,
+                     ss = %d
+                  ON DUPLICATE KEY UPDATE 
                      oke = %d,
                      reg = %d,
                      yes = %d,
                      ss = %d
                   ",
                   $_kota,
+                  $oke[$idx],
+                  $reg[$idx],
+                  $yes[$idx],
+                  $ss[$idx],
                   $oke[$idx],
                   $reg[$idx],
                   $yes[$idx],
@@ -147,7 +161,10 @@ class JNEShipping {
                   );
                   $wpdb->query($sqlInsert);
                }
+               echo "<p>{$idx} Importing: {$_kota}</p>";
+               flush();
             }
+            return;
          }
          
          include_once('display_tarif_import.view.php');
@@ -162,6 +179,24 @@ class JNEShipping {
          $id = $_GET['id'];
          $wpdb->query("DELETE FROM {$table_name} WHERE id={$id}");
          $__message = "Data telah dihapus.";
+      }
+      
+      if (isset($_POST['act']) && $_POST['act'] == 'delete-all') {
+      	$ids = $_POST['post'];
+      	if (is_array($ids)) {
+		   	foreach ($ids as $id) {
+		      	$wpdb->query("DELETE FROM {$table_name} WHERE id={$id}");
+		      }
+		      $__message = "Data telah dihapus.";
+         }
+      } else if (isset($_POST['act']) && $_POST['act'] == 'reset') {
+      	$wpdb->query("TRUNCATE TABLE {$table_name}");
+	      $__message = "Data telah dikosongkan.";
+      } else if (isset($_POST['act']) && $_POST['act'] == 'export') {
+      	$rs = $wpdb->get_results("SELECT * FROM {$table_name}");
+	      #$__message = "Data telah dikosongkan.";
+	      #foreach($rs as $row) {
+	      #}
       }
       
       if (isset($_POST['action']) && $_POST['action'] == 'update') {
@@ -201,8 +236,18 @@ class JNEShipping {
              
       }
       
-      $sql = "SELECT * FROM {$table_name} ";
-      $results = $wpdb->get_results($sql);      
+      $page = $_GET['pg'];
+      if ($page == 0) $page = 1;
+      $sql = "SELECT COUNT(*) as cnt FROM {$table_name} ";
+      $rsCnt = $wpdb->get_results($sql);
+      $items = $rsCnt[0]->cnt;
+      $pages = ceil($items / 20); 
+      $offset = ($page * 20) - 20;
+      $prev = ($page - 1 > 0 ? $page - 1 : 1);
+      $next = ($page + 1 > $pages ? $pages : $page + 1);
+      
+      $sql = "SELECT * FROM {$table_name} LIMIT {$offset}, 20";
+      $results = $wpdb->get_results($sql);
       
       include_once('display_tarif.view.php');
    }
@@ -269,6 +314,8 @@ class JNEShipping {
    function getTarif($destination) {
       global $wpdb;
       
+      if (empty($destination)) return array(0);
+      
       $currentDestLocation = $_SESSION['wpe_jneshipp_current_dest_location'];
       $currentWeightInPound = $_SESSION['wpe_jneshipp_current_weight_in_pound'];
       
@@ -308,6 +355,7 @@ class JNEShipping {
       $idx = 0;
       
       $data = $this->getTarif($to); #echo 'display'; #print_r($data);
+      if (!is_array($data)) die('<tr class="'.$this->internal_name.'_0"><td colspan="5">Tidak dapat menampilkan data.</td></tr>');
       foreach($data as $k => $v) {
          $class_id = $this->internal_name.'_'.$idx++;
          
