@@ -1,5 +1,5 @@
 === JNE Shipping ===
-Contributors: Agung Nugroho
+Contributors: abuazzam
 Tags: JNE, wp e-commerce, shipping plugin, Indonesian Shipping plugin, JNE shipping
 Requires at least: 4.2
 Tested up to: 4.4.2
