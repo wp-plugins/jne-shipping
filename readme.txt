@@ -3,7 +3,7 @@ Contributors: abuazzam
 Tags: JNE, wp e-commerce, shipping plugin, Indonesian Shipping plugin, JNE shipping
 Requires at least: 4.2
 Tested up to: 4.4.2
-Stable tag: 1.7
+Stable tag: 1.7 
 
 Plugin JNE Shipping Indonesia yang khusus untuk diintegrasikan dengan plugin WP-Ecommerce.
 
