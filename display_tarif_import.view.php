@@ -11,6 +11,7 @@
 <br class="clear">
 <?php if (isset($tarif)):  ?>
 <h3>Preview Data Tarif</h3>
+<p>Ada <b><?php echo count($tarif); ?> data</b>, preview hanya sebagian data.</p>
 <form method="post">
 <div class="tablenav top">
 <div class="alignleft">
@@ -43,7 +44,7 @@
    </tr>
 </tfoot>
 <tbody>
-<?php foreach($tarif as $idx => $_tarif): ?>
+<?php foreach($tarif as $idx => $_tarif): if ($idx > 100) break; ?>
 <tr>
    <td><?php echo $_tarif[0];?><input type="hidden" name="kota[<?php echo $idx;?>]" value="<?php echo $_tarif[0];?>" /></td>
    <td><?php echo $_tarif[1];?><input type="hidden" name="oke[<?php echo $idx;?>]" value="<?php echo $_tarif[1];?>" /></td>
@@ -53,6 +54,7 @@
 </tr>
 <?php endforeach; ?>
 </tbody></table>
+<input type="hidden" name="uploadfile" id="taif-file" value="<?php echo $uploadfile;?>"/>
 </form>
 <?php else: ?>
 

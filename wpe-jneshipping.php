@@ -3,7 +3,7 @@
  Plugin Name: JNE Shipping
  Plugin URI: http://blog.chung.web.id/tag/jne-indo-shipping/
  Description: Indonesian typical JNE Shipping Module For WP E-Commerce
- Version: 1.6
+ Version: 1.7
  Author: Agung Nugroho
  Author URI: http://chung.web.id/
 */
@@ -32,11 +32,22 @@ class JNEShipping {
       $this->name = "JNE Shipping";
       $this->is_external = true;
       $this->pluginUrl = get_option('siteurl') . '/wp-content/plugins/' . dirname(plugin_basename(__FILE__));
-		$this->baseUrl = get_option('siteurl') . '/wp-admin/options-general.php?page=jne-shipping';
+	  $this->baseUrl = get_option('siteurl') . '/wp-admin/options-general.php?page=jne-shipping';
 		
-		$this->table_name = $wpdb->prefix . 'jne_shipping';
+	  $this->table_name = $wpdb->prefix . 'jne_shipping';
+	  
+	  add_action( 'admin_notices', array(&$this, 'adminNotice') );
       
       return true;
+   }
+   
+   function adminNotice() {
+	   if (get_option('jne_shipping_onlist_status') == 2) return;
+	   ?>
+		<div class="updated">
+			<p><b><?php echo $this->name;?> is ready.</b> If you want to edit or import shipping rates go to <a href="<?php echo $this->baseUrl;?>">settings</a> page.</p>
+		</div>
+		<?php
    }
    
    function getName() {
@@ -88,9 +99,32 @@ class JNEShipping {
       global $wpdb;
       $table_name = $wpdb->prefix . 'jne_shipping';
       
+      global $current_user;
+      get_currentuserinfo();
+      $username = $current_user->display_name;
+      $email = $current_user->user_email;
+      
       if (isset($_GET['donate']) && $_GET['donate'] == '1') {
          update_option('jne_shipping_donation', 'yes');
       }
+      
+      if (isset($_GET['isRegistered']) && $_GET['isRegistered'] == '1') {
+		 update_option('jne_shipping_onlist_status', '2');
+	  }
+	  
+	  if (isset($_GET['subscribe']) && $_GET['subscribe'] == '1') {
+		 update_option('jne_shipping_onlist_status', '1');
+		 update_option('jne_shipping_email', $_GET['email']);
+		 update_option('jne_shipping_name', $_GET['name']);
+	  }
+	  
+      if (get_option('jne_shipping_onlist_status') == 0) {
+		  include_once("activate.view.php");
+		  return;
+	  } else if (get_option('jne_shipping_onlist_status') == 1) {
+		  include_once("activate2.view.php");
+		  return;
+	  }
       
       if (isset($_GET['act']) && $_GET['act'] == 'import') {
       
@@ -110,59 +144,62 @@ class JNEShipping {
          } else if (isset($_POST['action']) && $_POST['action'] == 'import') {
          	set_time_limit(0);
          	
-            $kota = $_POST['kota'];
-            $oke = $_POST['oke'];
-            $reg = $_POST['reg'];
-            $yes = $_POST['yes'];
-            $ss = $_POST['ss'];
             $insert_opt = $_POST['insert_opt'];
+            $uploadfile = $_POST['uploadfile'];
             
-            include_once('display_tarif_import.view.php');
-            flush();
+            if (($handle = fopen($uploadfile, "r")) !== FALSE) {
             
-            foreach ($kota as $idx => $_kota) {
-               if ($insert_opt == 'update') {
-                  $sqlUpdate = $wpdb->prepare("INSERT INTO {$this->table_name} SET 
-                     kota = %s,
-                     oke = %d,
-                     reg = %d,
-                     yes = %d,
-                     ss = %d
-                  ON DUPLICATE KEY UPDATE 
-                     oke = %d,
-                     reg = %d,
-                     yes = %d,
-                     ss = %d
-                  ",
-                  $_kota,
-                  $oke[$idx],
-                  $reg[$idx],
-                  $yes[$idx],
-                  $ss[$idx],
-                  $oke[$idx],
-                  $reg[$idx],
-                  $yes[$idx],
-                  $ss[$idx]
-                  );
-                  $wpdb->query($sqlUpdate);
-               } else if ($insert_opt == 'ignore') {
-                  $sqlInsert = $wpdb->prepare("INSERT IGNORE INTO {$this->table_name} SET 
-                     kota = %s,
-                     oke = %d,
-                     reg = %d,
-                     yes = %d,
-                     ss = %d
-                  ",
-                  $_kota,
-                  $oke[$idx],
-                  $reg[$idx],
-                  $yes[$idx],
-                  $ss[$idx]
-                  );
-                  $wpdb->query($sqlInsert);
-               }
-               echo "<p>{$idx} Importing: {$_kota}</p>";
-               flush();
+				include_once('display_tarif_import.view.php');
+				flush();
+				
+				$row=0;
+				while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+				   if ($insert_opt == 'update') {
+					  $sqlUpdate = $wpdb->prepare("INSERT INTO {$this->table_name} SET 
+						 kota = %s,
+						 oke = %d,
+						 reg = %d,
+						 yes = %d,
+						 ss = %d
+					  ON DUPLICATE KEY UPDATE 
+						 oke = %d,
+						 reg = %d,
+						 yes = %d,
+						 ss = %d
+					  ",
+					  $data[0],
+					  $data[1],
+					  $data[2],
+					  $data[3],
+					  $data[4],
+					  $data[1],
+					  $data[2],
+					  $data[3],
+					  $data[4]
+					  );
+					  $wpdb->query($sqlUpdate);
+				   } else if ($insert_opt == 'ignore') {
+					  $sqlInsert = $wpdb->prepare("INSERT IGNORE INTO {$this->table_name} SET 
+						 kota = %s,
+						 oke = %d,
+						 reg = %d,
+						 yes = %d,
+						 ss = %d
+					  ",
+					  $data[0],
+					  $data[1],
+					  $data[2],
+					  $data[3],
+					  $data[4]
+					  );
+					  $wpdb->query($sqlInsert);
+				   }
+				   $row++;
+				   echo "<p>{$row} Importing: {$data[0]}</p>";
+				   flush();
+				}
+				
+				fclose($handle);
             }
             return;
          }
@@ -252,17 +289,7 @@ class JNEShipping {
       include_once('display_tarif.view.php');
    }
 
-	function adminMenu() {
-		/*if (function_exists('add_object_page')) {
-			add_object_page('JNEShipping', 'JNE Shipping', 2, 'jne-shipping', array(&$this, 'adminForm'), $this->pluginUrl.'/jne-icon.png');
-		} else {
-			add_menu_page('JNEShipping', 'JNE Shipping', 2, 'jne-shipping', array(&$this, 'adminForm'), $this->pluginUrl.'/jne-icon.png');
-		}
-		
-		add_submenu_page('jne-shipping', 'Options', 'Options', 7, 'jne-shipping', array(&$this, 'adminForm'));
-		add_submenu_page('jne-shipping', 'Data Tarif', 'Data Tarif', 7, 'jne-tarif', array(&$this, 'daftarTarif'));
-		*/
-		
+	function adminMenu() {		
 		if (function_exists('add_options_page'))
 			add_options_page( 'JNE Shipping Options', 'JNE Shipping', 'administrator', 'jne-shipping', array(&$this, 'daftarTarif') );
 	}

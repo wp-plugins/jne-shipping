@@ -9,14 +9,14 @@
 <input type="hidden" name="currency_code" value="USD" />
 <div style="float:right;width:20%;padding:15px 5px;text-align:center;">
    <select name="amount" style="width:85px;">
-      <option value="1">$1</option>
-      <option value="2" selected="selected">$2</option>
-      <option value="5">$5</option>
-      <option value="10">$10</option>
-      <option value="20">$20</option>
-      <option value="50">$50</option>
+      <option value="5">USD 5</option>
+      <option value="10">USD 10</option>
+      <option value="15" selected>USD 15</option>
+      <option value="20">USD 20</option>
+      <option value="25">USD 25</option>
+      <option value="50">USD 50</option>
    </select><br />
-   <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online." />
+   <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online." />
 </div>
 </form>
 <br class="clear" />
